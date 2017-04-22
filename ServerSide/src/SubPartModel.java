@@ -49,6 +49,6 @@ public class SubPartModel{
 				"\nName: " + this.name +
 				"\nDescription: " + this.description +
 				"\nId parent: " + this.idParent +
-				"\nQuantity" + this.quantity;	
+				"\nQuantity: " + this.quantity;	
 	}
 }
