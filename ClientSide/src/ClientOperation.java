@@ -46,36 +46,47 @@ public class ClientOperation {
 			switch(command){
 			case "1":
 				listServers();
+				scanner.nextLine();
 				break;
 			case "2":
 				connectServer();
+				scanner.nextLine();
 				break;
 			case "3":
 				addPart();
+				scanner.nextLine();
 				break;
 			case "4":
 				addSubPart();
+				scanner.nextLine();
 				break;
 			case "5":
 				listRepositoryParts();
+				scanner.nextLine();
 				break;
 			case "6":
 				listSubParts();
+				scanner.nextLine();
 				break;
 			case "7":
 				clearSubParts();
+				scanner.nextLine();
 				break;
 			case "8":
 				selectPart();
+				scanner.nextLine();
 				break;
 			case "9":
 				selectSubPart();
+				scanner.nextLine();
 				break;
 			case "10":
 				showPart();
+				scanner.nextLine();
 				break;
 			case "11":
 				showSubPart();
+				scanner.nextLine();
 				break;				
 			case "12":
 				continueRunning = false;
