@@ -5,12 +5,10 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
-import javax.swing.JOptionPane;
-
 public class ClientOperation {
 
 	private static RMIInterface look_up;
-	public static String currentServer = "";
+	public static String currentServer = "/";
 	public static int currentPart = 0;
 	public static int currentSubPart = 0;
 	public static Scanner scanner = new Scanner(System.in);;
@@ -23,6 +21,7 @@ public class ClientOperation {
 
 		System.out.println("Iniciando cliente...");
 		while (continueRunning) {
+			System.out.println();
 			System.out.println("Digite o numero da ação que deseja fazer");
 			System.out.println("1 - Listar os repositórios disponiveis");
 			System.out.println("2 - Conectar ao repositório");
@@ -33,7 +32,13 @@ public class ClientOperation {
 			System.out.println("7 - Limpar subpeças");
 			System.out.println("8 - Selecionar peça");
 			System.out.println("9 - Selecionar subpeça");
-			System.out.println("10 - Sair");
+			System.out.println("10 - Mostrar peça atual");
+			System.out.println("11 - Mostrar subpeça atual");
+			System.out.println("12 - Sair");
+			System.out.println("--------------");
+			System.out.println("Repositório atual: " + currentServer);
+			System.out.println("Parte atual: " + currentPart);
+			System.out.println("Subarte atual: " + currentSubPart);
 			System.out.println("--------------");
 
 			command = scanner.nextLine();
@@ -67,6 +72,12 @@ public class ClientOperation {
 				selectSubPart();
 				break;
 			case "10":
+				showPart();
+				break;
+			case "11":
+				showSubPart();
+				break;				
+			case "12":
 				continueRunning = false;
 				break;					
 			default:
@@ -76,8 +87,38 @@ public class ClientOperation {
 		}
 	}
 
+
+	private static void showSubPart() throws RemoteException {
+		if(currentServer.equals("/")){
+			System.out.println("Repositório não selecionado");
+			return;
+		}
+		if(currentPart == 0){
+			System.out.println("Peça não selecionada");
+			return;
+		}
+		if(currentSubPart == 0){
+			System.out.println("Subpeça não selecionada");
+			return;
+		}
+		System.out.println(look_up.getSubPart(currentPart));
+	}
+
+	private static void showPart() throws RemoteException {
+		if(currentServer.equals("/")){
+			System.out.println("Repositório não selecionado");
+			return;
+		}
+		if(currentPart == 0){
+			System.out.println("Peça não selecionada");
+			return;
+		}
+		System.out.println(look_up.getPart(currentPart));
+		
+	}
+
 	private static void listSubParts() throws RemoteException {
-		if(currentServer.equals("")){
+		if(currentServer.equals("/")){
 			System.out.println("Repositório não selecionado");
 			return;
 		}
@@ -96,13 +137,16 @@ public class ClientOperation {
 		String[] names = Naming.list("//localhost:1099/");
 		String aux = currentServer;
 
-		for (int i = 0; i < names.length; i++)
+		for (int i = 0; i < names.length; i++){
+			System.out.println(names[i]);
 			if(serverName.equals(names[i])){
 				currentServer = names[i];
-				look_up = (RMIInterface) Naming.lookup("//localhost/MyServer");
+				look_up = (RMIInterface) Naming.lookup(currentServer);
+				currentPart = 0;
+				currentSubPart = 0;
 			}
-
-		if(!currentServer.equals(aux)){
+		}
+		if(currentServer.equals(aux)){
 			System.out.println("Repositório não encontrado");
 		}else{
 			System.out.println("Repositório atual: " + currentServer);
@@ -110,7 +154,7 @@ public class ClientOperation {
 	}
 
 	private static void selectSubPart() throws RemoteException, MalformedURLException {
-		if(currentServer.equals("")){
+		if(currentServer.equals("/")){
 			System.out.println("Repositório não selecionado");
 			return;
 		}
@@ -129,7 +173,7 @@ public class ClientOperation {
 	}
 
 	private static void selectPart() throws RemoteException {
-		if(currentServer.equals("")){
+		if(currentServer.equals("/")){
 			System.out.println("Repositório não selecionado");
 			return;
 		}
@@ -137,6 +181,7 @@ public class ClientOperation {
 		int idPart = scanner.nextInt();
 		if(look_up.verifyPart(idPart)){
 			currentPart = idPart;
+			currentSubPart = 0;
 			System.out.println("Peça selecionada");
 		}else{
 			System.out.println("Peça não encontrada");
@@ -144,7 +189,7 @@ public class ClientOperation {
 	}
 
 	private static void clearSubParts() throws RemoteException, MalformedURLException, NotBoundException {
-		if(currentServer.equals("")){
+		if(currentServer.equals("/")){
 			System.out.println("Repositório não selecionado");
 			return;
 		}
@@ -157,7 +202,7 @@ public class ClientOperation {
 	}
 
 	private static void listRepositoryParts() throws RemoteException {
-		if(currentServer.equals("")){
+		if(currentServer.equals("/")){
 			System.out.println("Repositório não selecionado");
 			return;
 		}
@@ -165,25 +210,19 @@ public class ClientOperation {
 	}
 
 	private static void addPart() throws RemoteException {
-		if(currentServer.equals("")){
+		if(currentServer.equals("/")){
 			System.out.println("Repositório não selecionado");
-			return;
-		}
-		if(currentPart == 0){
-			System.out.println("Peça não selecionada");
 			return;
 		}
 		System.out.println("Digite os valores: <<codigo>>/<<nome>>/<<descricao>>/<<éPrimitivo(0 ou 1)>>");
 		String part = scanner.nextLine();
 		String[] splitPart = part.split("/");
-		if(splitPart.length == 4){
+		if(splitPart.length != 4){
 			System.out.println("Entrada inválida");
 			return;
 		}
 		try {
 			int idPart = Integer.parseInt(splitPart[0]);
-			String name = splitPart[1];
-			String description = splitPart[2];
 			int primitive = Integer.parseInt(splitPart[3]);
 			boolean isPrimitive;
 			if(primitive == 1){
@@ -196,9 +235,9 @@ public class ClientOperation {
 					return;
 				}
 			}
-			PartModel partModel = new PartModel(idPart, name, description, isPrimitive);
-			System.out.println(look_up.savePart(partModel));
-			
+			System.out.println(look_up.savePart(part));
+			currentPart = idPart;
+
 		}catch (NumberFormatException e) {
 			System.out.println("Entrada inválida");
 			return;
@@ -206,29 +245,26 @@ public class ClientOperation {
 	}
 
 	private static void addSubPart() throws RemoteException {
-		if(currentServer.equals("")){
+		if(currentServer.equals("/")){
 			System.out.println("Repositório não selecionado");
 			return;
-		}
-		if(currentPart == 0){
-			System.out.println("Peça não selecionada");
-			return;
-		}
-		System.out.println("Digite os valores: <<codigo>>/<<nome>>/<<descricao>>/<<quantidade>>");
+		}		
+		System.out.println("Digite os valores: <<codigo>>/<<nome>>/<<descricao>>/<<quantidade>>/<<codigo peça pai>>");
 		String part = scanner.nextLine();
 		String[] splitPart = part.split("/");
-		if(splitPart.length == 4){
+		if(splitPart.length != 5){
 			System.out.println("Entrada inválida");
 			return;
 		}
 		try {
 			int idSubPart = Integer.parseInt(splitPart[0]);
-			String name = splitPart[1];
-			String description = splitPart[2];
-			int quantity = Integer.parseInt(splitPart[3]);			
-			SubPartModel subPartModel = new SubPartModel(idSubPart, name, description, quantity, currentPart);
-			System.out.println(look_up.addSubPart(subPartModel));
-			
+			int parent = Integer.parseInt(splitPart[4]);
+			if(look_up.verifyPart(parent)){
+				System.out.println(look_up.addSubPart(part));
+				currentSubPart = idSubPart;
+			}else{
+				System.out.println("Peça não encontrada");
+			}
 		}catch (NumberFormatException e) {
 			System.out.println("Entrada inválida");
 			return;
