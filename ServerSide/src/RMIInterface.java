@@ -15,4 +15,6 @@ public interface RMIInterface extends Remote {
     public String addSubPart(SubPartModel subPart) throws RemoteException;
     public String DeleteSubPart(int idSubPart) throws RemoteException;
 	String cleanRemoteSubParts(int idPart) throws RemoteException, MalformedURLException, NotBoundException;
+	boolean verifyPart(int idPart) throws RemoteException;
+	boolean verifySubPart(int idSubPart) throws RemoteException;
 }

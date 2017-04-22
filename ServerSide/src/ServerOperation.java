@@ -11,8 +11,9 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     
     ArrayList<PartModel> savedParts = new ArrayList<PartModel>();
     ArrayList<SubPartModel> savedSubParts = new ArrayList<SubPartModel>();
-    String NOT_FOUND = "Not found";
-    String SUCCESS = "Success";
+    String NOT_FOUND = "Não encontrado";
+    String SUCCESS = "Sucesso";
+    String ERROR = "Não foi possivel completar";
 	private static RMIInterface look_up;
     
     protected ServerOperation() throws RemoteException {
@@ -36,6 +37,9 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
 	@Override
 	public String savePart(PartModel part) throws RemoteException {
+		if(verifyPart(part.getId())){
+			return ERROR;
+		}
 		this.savedParts.add(part);
 		return SUCCESS;
 	}
@@ -123,6 +127,9 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
 	@Override
 	public String addSubPart(SubPartModel subPart) throws RemoteException {
+		if(verifySubPart(subPart.getId())){
+			return ERROR;
+		}
 		this.savedSubParts.add(subPart);
 		return SUCCESS;
 	}
@@ -140,6 +147,26 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 	
 	public String[] getAllServers() throws RemoteException, MalformedURLException{
 		return Naming.list("//localhost:1099/");		
+	}
+
+	@Override
+	public boolean verifyPart(int idPart) throws RemoteException {
+		for(int i=0; i<this.savedParts.size(); i++){
+			if(this.savedParts.get(i).getId() == idPart){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean verifySubPart(int idSubPart) throws RemoteException {
+		for(int i=0; i<this.savedSubParts.size(); i++){
+			if(this.savedSubParts.get(i).getId() == idSubPart){
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
