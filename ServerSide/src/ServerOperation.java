@@ -20,11 +20,6 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
         super();
     }
 
-    @Override
-    public String helloTo(String name) throws RemoteException{    	
-    	System.err.println(name + " is trying to contact!");        
-        return "Server says hello to " + name;
-    }
     public static void main(String[] args){
         try {
             Naming.rebind("//localhost/"+ args[0], new ServerOperation());
@@ -36,11 +31,25 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
 	@Override
-	public String savePart(PartModel part) throws RemoteException {
-		if(verifyPart(part.getId())){
+	public String savePart(String part) throws RemoteException {
+		String[] splitPart = part.split("/");
+		int idPart = Integer.parseInt(splitPart[0]);
+		String name = splitPart[1];
+		String description = splitPart[2];
+		int primitive = Integer.parseInt(splitPart[3]);
+		boolean isPrimitive;
+		
+		if(primitive == 1)
+			isPrimitive = true;
+		else
+			isPrimitive = false;
+		
+		PartModel partModel = new PartModel(idPart, name, description, isPrimitive);
+		if(verifyPart(partModel.getId())){
 			return ERROR;
 		}
-		this.savedParts.add(part);
+		this.savedParts.add(partModel);
+		
 		return SUCCESS;
 	}
 
@@ -49,6 +58,16 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 		for(int i=0; i<this.savedParts.size(); i++){
 			if(this.savedParts.get(i).getId() == partId){
 				return this.savedParts.get(i).toString(); 
+			}
+		}
+		return NOT_FOUND;
+	}
+	
+	@Override
+	public String getSubPart(int partId) throws RemoteException {
+		for(int i=0; i<this.savedSubParts.size(); i++){
+			if(this.savedSubParts.get(i).getId() == partId){
+				return this.savedSubParts.get(i).toString(); 
 			}
 		}
 		return NOT_FOUND;
@@ -126,11 +145,20 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 	}
 
 	@Override
-	public String addSubPart(SubPartModel subPart) throws RemoteException {
-		if(verifySubPart(subPart.getId())){
+	public String addSubPart(String subPart) throws RemoteException {
+		String[] splitPart = subPart.split("/");
+		int idSubPart = Integer.parseInt(splitPart[0]);
+		String name = splitPart[1];
+		String description = splitPart[2];
+		int quantity = Integer.parseInt(splitPart[3]);
+		int parent = Integer.parseInt(splitPart[4]);
+		
+		SubPartModel subPartModel = new SubPartModel(idSubPart, name, description, quantity, parent);
+		
+		if(verifySubPart(subPartModel.getId())){
 			return ERROR;
 		}
-		this.savedSubParts.add(subPart);
+		this.savedSubParts.add(subPartModel);
 		return SUCCESS;
 	}
 

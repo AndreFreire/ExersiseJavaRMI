@@ -48,7 +48,7 @@ public class PartModel {
 		return 	"\nId: "+ this.id +
 				"\nName: "+ this.name +
 				"\nDescription: "+this.description +
-				"\nPrimitive"+ this.isPrimitive;
+				"\nPrimitive: "+ this.isPrimitive;
 		
 	}
 }
