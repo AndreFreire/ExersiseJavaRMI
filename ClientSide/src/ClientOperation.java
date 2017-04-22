@@ -209,7 +209,7 @@ public class ClientOperation {
 			return;
 		}
 		look_up.cleanRemoteSubParts(currentPart);
-
+		System.out.println("Subpeças limpadas");
 	}
 
 	private static void listRepositoryParts() throws RemoteException {
